@@ -45,6 +45,7 @@ async fn main() -> Result<()> {
 	let downloader = Downloader::new(Requester::new().await?, Converter::new()?).with_subscriber(
 		EventSubscriber::new(
 			&|x| fprintln!("Downloading {}", x),
+			&|x| fprintln!("Converting {}", x),
 			&|x| fprintln!("Finished downloading {}", x),
 			&|x| fprintln!("Failed downloading {}", x),
 		),
