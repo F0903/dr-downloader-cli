@@ -1,0 +1,45 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug executable 'dr-downloader-cli'",
+			"cargo": {
+				"args": [
+					"build",
+					"--bin=dr-downloader-cli",
+					"--package=dr-downloader-cli"
+				],
+				"filter": {
+					"name": "dr-downloader-cli",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug unit tests in executable 'dr-downloader-cli'",
+			"cargo": {
+				"args": [
+					"test",
+					"--no-run",
+					"--bin=dr-downloader-cli",
+					"--package=dr-downloader-cli"
+				],
+				"filter": {
+					"name": "dr-downloader-cli",
+					"kind": "bin"
+				}
+			},
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		}
+	]
+}
