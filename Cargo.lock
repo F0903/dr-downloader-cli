@@ -128,7 +128,7 @@ dependencies = [
 [[package]]
 name = "dr-downloader"
 version = "0.4.0"
-source = "git+https://github.com/F0903/dr-downloader#989d7dfa390b8d9463783e299fb9556b889f3a7a"
+source = "git+https://github.com/F0903/dr-downloader#7a228e1ec9393488bc094e40d892ce32ccebbe78"
 dependencies = [
  "async-recursion",
  "futures",
@@ -138,7 +138,6 @@ dependencies = [
  "reqwest",
  "serde_json",
  "tokio",
- "winapi",
  "winreg 0.8.0",
 ]
 
