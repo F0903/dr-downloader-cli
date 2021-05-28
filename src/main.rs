@@ -12,6 +12,8 @@ use dr_downloader::{
 };
 use std::io::stdin;
 
+const FFMPEG: &[u8] = include_bytes!("../ffmpeg-win32.exe");
+
 macro_rules! do_while {
 	(($cond:expr)$body:block) => {
 		loop {
@@ -37,19 +39,26 @@ fn log_error(err: impl AsRef<dyn std::error::Error>) {
 	std::fs::write("error.txt", content).ok();
 }
 
+fn create_ffmpeg<'a>() -> Result<String> {
+	let dir = std::env::temp_dir().join("ffmpeg.exe");
+	let dir_str = dir.to_string_lossy().into_owned();
+	std::fs::write(&dir_str, FFMPEG)?;
+	Ok(dir_str)
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
 	#[cfg(all(windows, not(debug_assertions)))]
 	win32::set_virtual_console_mode();
 
-	let downloader = Downloader::new(Requester::new().await?, Converter::new()?).with_subscriber(
-		EventSubscriber::new(
+	let downloader = Downloader::new(Requester::new().await?)
+		.with_converter(Converter::new(create_ffmpeg()?))
+		.with_subscriber(EventSubscriber::new(
 			&|x| fprintln!("Downloading {}", x),
 			&|x| fprintln!("Converting {}", x),
 			&|x| fprintln!("Finished downloading {}", x),
 			&|x| fprintln!("Failed downloading {}", x),
-		),
-	);
+		));
 
 	let mut args = std::env::args();
 	let input_mode = args.len() <= 1;
