@@ -39,7 +39,7 @@ fn log_error(err: impl AsRef<dyn std::error::Error>) {
 	std::fs::write("error.txt", content).ok();
 }
 
-fn create_ffmpeg<'a>() -> Result<String> {
+fn create_ffmpeg() -> Result<String> {
 	let dir = std::env::temp_dir().join("ffmpeg.exe");
 	let dir_str = dir.to_string_lossy().into_owned();
 	std::fs::write(&dir_str, FFMPEG)?;
