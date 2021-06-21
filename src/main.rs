@@ -7,8 +7,7 @@ mod win32;
 mod printutil;
 
 use dr_downloader::{
-	converter::Converter, downloader::Downloader, error::Result, event_subscriber::EventSubscriber,
-	requester::Requester,
+	converter::Converter, downloader::Downloader, error::Result, requester::Requester, saver::Saver,
 };
 use std::io::stdin;
 
@@ -32,11 +31,20 @@ fn clear_console() {
 fn log_error(err: impl AsRef<dyn std::error::Error>) {
 	fprintln!("\x1B[91mError!\x1B[0m {}", err.as_ref());
 	let trace = err.as_ref().backtrace();
-	let content = match trace {
+	let mut content = match trace {
 		Some(val) => val.to_string(),
 		None => err.as_ref().to_string(),
 	};
-	std::fs::write("error.txt", content).ok();
+	content.push('\n');
+	let mut file = if let Ok(f) =
+		std::fs::File::open("error.txt").or_else(|_| std::fs::File::create("error.txt"))
+	{
+		f
+	} else {
+		return;
+	};
+	use std::io::Write;
+	file.write_all(content.as_bytes()).ok();
 }
 
 fn create_ffmpeg() -> Result<String> {
@@ -51,14 +59,25 @@ async fn main() -> Result<()> {
 	#[cfg(all(windows, not(debug_assertions)))]
 	win32::set_virtual_console_mode();
 
-	let downloader = Downloader::new(Requester::new().await?)
-		.with_converter(Converter::new(create_ffmpeg()?))
-		.with_subscriber(EventSubscriber::new(
-			&|x| fprintln!("Downloading {}", x),
-			&|x| fprintln!("Converting {}", x),
-			&|x| fprintln!("Finished downloading {}", x),
-			&|x| fprintln!("Failed downloading {}", x),
-		));
+	let mut downloader = Downloader::new(Requester::new().await?);
+	downloader
+		.download_event
+		.sub(&|x| fprintln!("Downloading {}...", x));
+	downloader
+		.finished_event
+		.sub(&|x| fprintln!("Finished downloading {}", x));
+	downloader
+		.failed_event
+		.sub(&|x| fprintln!("Failed downloading {}", x));
+
+	let mut converter = Converter::new(create_ffmpeg()?);
+	converter
+		.on_convert
+		.sub(&|x| fprintln!("Converting {}...", x));
+	converter
+		.on_done
+		.sub(&|x| fprintln!("Finished converting {}", x));
+	let saver = Saver::new(downloader).with_converter(converter, ".mp4");
 
 	let mut args = std::env::args();
 	let input_mode = args.len() <= 1;
@@ -77,7 +96,7 @@ async fn main() -> Result<()> {
 			inp.read_line(&mut input_buffer)?;
 		}
 
-		let result = downloader.download("./", &input_buffer).await;
+		let result = saver.save(&input_buffer, "./").await;
 
 		if let Err(val) = result {
 			log_error(val);

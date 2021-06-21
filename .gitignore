@@ -1,4 +1,5 @@
 /target
 
+*.m3u8
 *.mp4
 error.txt
