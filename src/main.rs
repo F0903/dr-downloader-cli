@@ -7,7 +7,7 @@ mod win32;
 mod printutil;
 
 use dr_downloader::{
-	converter::Converter, downloader::Downloader, error::Result, requester::Requester, saver::Saver,
+	converter::Converter, downloader::Downloader, error::Result, saver::Saver,
 };
 use std::io::stdin;
 
@@ -59,7 +59,7 @@ async fn main() -> Result<()> {
 	#[cfg(all(windows, not(debug_assertions)))]
 	win32::set_virtual_console_mode();
 
-	let mut downloader = Downloader::new(Requester::new().await?);
+	let mut downloader = Downloader::default();
 	downloader
 		.download_event
 		.sub(&|x| fprintln!("Downloading {}...", x));

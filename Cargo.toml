@@ -1,17 +1,17 @@
 [package]
 name = "dr-downloader-cli"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Frederik P. B. H. <frepbh@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dr-downloader = { git="https://github.com/F0903/dr-downloader" }
-tokio = { version="^1", features=["rt", "rt-multi-thread"] }
+dr-downloader = { git = "https://github.com/F0903/dr-downloader" }
+tokio = { version = "^1", features = ["rt", "rt-multi-thread"] }
 
 [target.'cfg(windows)'.dependencies]
-winapi = { version="^0.3", features=[
+winapi = { version = "^0.3", features = [
 	"consoleapi",
 	"errhandlingapi",
 	"processenv",
