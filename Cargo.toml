@@ -1,6 +1,6 @@
 [package]
 name = "dr-downloader-cli"
-version = "1.0.1"
+version = "1.0.2"
 authors = ["Frederik P. B. H. <frepbh@gmail.com>"]
 edition = "2021"
 
