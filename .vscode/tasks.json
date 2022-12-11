@@ -8,7 +8,16 @@
 				"$rustc"
 			],
 			"group": "build",
-			"label": "Rust: cargo build - dr-downloader-cli"
+			"label": "Build Release"
+		},
+		{
+			"command": "cargo",
+			"args": ["build"],
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": "build",
+			"label": "Build Debug"
 		}
 	]
 }
