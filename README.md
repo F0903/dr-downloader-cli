@@ -2,9 +2,10 @@
 
 [![Rust](https://github.com/F0903/dr-downloader/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/F0903/dr-downloader/actions/workflows/rust.yml)
 
-A downloader that downloads media from DR (Danish Broadcasting Corporation) in parallel, and converts them to convenient MP4 files.
+A command-line downloader that downloads media from DR (Danish Broadcasting Corporation) in parallel, and converts them to convenient MP4 files.
 
 To use, launch the executeable and use the commands below. (also works by passing launch arguments)
+To use as a library, [use the dedicated library instead.](https://github.com/F0903/dr-downloader)
 
 Release binaries are provided through the build action, and can be accessed through the Actions menu.
 
@@ -13,3 +14,8 @@ This program will most likely only work in Denmark, as DR has restrictions on wh
 Use of this program assumes you have the right to download the relevant media.
 
 ## Commands
+
+**download** *url* -> Downloads media.
+**token** get -> Prints current token.
+**token** set -> Sets current token.
+**clear** -> Clears terminal.
