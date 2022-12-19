@@ -15,7 +15,7 @@ Use of this program assumes you have the right to download the relevant media.
 
 ## Commands
 
-**download** *url* -> Downloads media.
-**token** get -> Prints current token.
-**token** set -> Sets current token.
-**clear** -> Clears terminal.
+**download** *url* -> Downloads media.  
+**token** get -> Prints current token.  
+**token** set -> Sets current token.  
+**clear** -> Clears terminal.  
