@@ -114,8 +114,16 @@ async fn clear() -> command_handler::Result<()> {
     Ok(())
 }
 
-async fn version() -> command_handler::Result<()> {
-    fprintln!("{}", VERSION);
+async fn version(args: Vec<String>) -> command_handler::Result<()> {
+    let mut arg_iter = args.into_iter();
+    let format = arg_iter.next();
+    match format {
+        Some(x) => match x.as_str() {
+            "no-newline" => fprint!("{}", VERSION),
+            _ => fprintln!("{}", VERSION),
+        },
+        None => fprintln!("{}", VERSION),
+    }
     Ok(())
 }
 
@@ -178,7 +186,7 @@ async fn main() -> Result<()> {
     cmds.register("clear", |_, _| Box::pin(clear()));
     cmds.register("download", |x, y| Box::pin(download(x.to_owned(), y)));
     cmds.register("token", |x, y| Box::pin(token(x, y)));
-    cmds.register("version", |_, _| Box::pin(version()));
+    cmds.register("version", |x, _| Box::pin(version(x)));
 
     let shared_saver = Arc::new(Mutex::new(saver));
 
