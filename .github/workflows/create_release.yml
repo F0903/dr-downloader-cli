@@ -15,16 +15,16 @@ jobs:
       contents: write
     
     steps:
-    - name: Set toolchain
-      run: rustup override set nightly
     - uses: actions/checkout@v3
     - name: Cache
       uses: actions/cache@v3.2.6
       with:
           path: target/
           key: ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+    - name: Set toolchain
+      run: rustup override set nightly
     - name: Build
-      run: cargo build +nightly --verbose --release
+      run: cargo build --verbose --release
     - name: Version
       run: echo "::set-output name=version::$(.\target\release\dr-downloader-cli.exe version)"
       id: version
