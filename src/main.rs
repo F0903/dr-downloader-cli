@@ -27,7 +27,6 @@ use std::{
 use tokio::sync::Mutex;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
-const FFMPEG: &[u8] = include_bytes!("../ffmpeg-win32.exe");
 
 fn log_error(err: impl AsRef<str>) {
     let err = err.as_ref();
@@ -48,10 +47,7 @@ fn create_ffmpeg() -> Result<String> {
     if std::fs::try_exists(FFMPEG_PATH)? {
         return Ok(FFMPEG_PATH.to_owned());
     };
-    let dir = std::env::temp_dir().join(FFMPEG_PATH);
-    let dir_str = dir.to_string_lossy().into_owned();
-    std::fs::write(&dir_str, FFMPEG)?;
-    Ok(dir_str)
+    return Err("FFmpeg not found! Please install FFmpeg and add to PATH or put the executable in the downloader root.".into());
 }
 
 async fn setup_downloader() -> Result<Downloader<'static>> {

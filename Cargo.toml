@@ -7,8 +7,13 @@ license-file = "LICENSE"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[profile.release]
+strip = true    # Automatically strip symbols from the binary.
+opt-level = "z" # Optimize for size.
+lto = true
+
 [dependencies]
-dr-downloader = { version = "0.6.0" }
+dr-downloader = { version = "0.6.1" }
 #dr-downloader = { path = "../dr-downloader" }                    # FOR DEBUGGING
 tokio = { version = "^1", features = ["rt", "rt-multi-thread"] }
 
