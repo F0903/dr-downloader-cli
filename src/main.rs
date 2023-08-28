@@ -203,8 +203,6 @@ async fn main() -> Result<()> {
         if let Err(val) = result {
             log_error(val.to_string());
         }
-
-        println!();
     });
     Ok(())
 }
