@@ -16,17 +16,12 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
-    - name: Cache
-      uses: actions/cache@v3.2.6
-      with:
-          path: target/
-          key: ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
     - name: Set toolchain
       run: rustup override set nightly
     - name: Build
       run: cargo build --verbose --release
     - name: Version
-      run: echo "::set-output name=version::$(.\target\release\dr-downloader-cli.exe version no-newline)"
+      run: echo "version=$(.\target\release\dr-downloader-cli.exe version no-newline)" >> $GITHUB_OUTPUT
       id: version
     - name: Create release
       uses: softprops/action-gh-release@v1
