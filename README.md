@@ -5,7 +5,7 @@
 
 A command-line downloader that downloads media from DR (Danish Broadcasting Corporation) in parallel, and converts them to convenient MP4 files (or any other format you'd like).
 
-To use, launch the executeable and use the commands below. (also works by passing launch arguments)
+To use, launch the executeable and use the commands below (also works by passing launch arguments).
 To use as a library, [use the dedicated library instead.](https://github.com/F0903/dr-downloader)
 
 Release binaries are provided through the build action, and can be accessed through the Actions menu.
