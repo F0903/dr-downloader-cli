@@ -115,14 +115,19 @@ async fn clear() -> command_handler::Result<()> {
 }
 
 async fn version(args: Vec<String>) -> command_handler::Result<()> {
-    let mut arg_iter = args.into_iter();
-    let format = arg_iter.next();
-    match format {
-        Some(x) => match x.as_str() {
-            "no-newline" => fprint!("{}", VERSION),
-            _ => fprintln!("{}", VERSION),
-        },
-        None => fprintln!("{}", VERSION),
+    let mut arg_iter = args.iter();
+    if arg_iter.any(|x| x == "no-newline") {
+        if arg_iter.any(|x| x == "no-flush") {
+            print!("{}", VERSION);
+            return Ok(());
+        }
+        fprint!("{}", VERSION);
+    } else {
+        if arg_iter.any(|x| x == "no-flush") {
+            println!("{}", VERSION);
+            return Ok(());
+        }
+        fprintln!("{}", VERSION);
     }
     Ok(())
 }
