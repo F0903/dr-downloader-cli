@@ -15,6 +15,11 @@ jobs:
       contents: write
     
     steps:
+    - name: Test
+      id: test
+      run: echo "test=hello" >> $GITHUB_OUTPUT
+    - name: TestB
+      run: echo ${{ steps.test.output.test }}
     - uses: actions/checkout@v3
     - name: Set toolchain
       run: rustup override set nightly
@@ -24,7 +29,7 @@ jobs:
       run: echo "version=$(.\target\release\dr-downloader-cli.exe version no-newline)" >> $GITHUB_OUTPUT
       id: version
     - name: Create release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v1 
       with:
-        tag_name: ${{ steps.Version.outputs.version }}
+        tag_name: ${{ steps.version.outputs.version }}
         files: target/release/dr-downloader-cli.exe
