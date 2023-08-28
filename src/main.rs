@@ -21,7 +21,7 @@ use dr_downloader::{
 };
 use marco_utils::do_while;
 use std::{
-    io::{stdin, Stdin},
+    io::{stdin, Stdin, Write},
     sync::Arc,
 };
 use tokio::sync::Mutex;
@@ -109,6 +109,7 @@ fn print_header() {
 }
 
 async fn clear() -> command_handler::Result<()> {
+    std::io::stdout().flush()?;
     fprint!("\x1B[2J\x1B[1;1H");
     print_header();
     Ok(())
@@ -117,16 +118,8 @@ async fn clear() -> command_handler::Result<()> {
 async fn version(args: Vec<String>) -> command_handler::Result<()> {
     let mut arg_iter = args.iter();
     if arg_iter.any(|x| x == "no-newline") {
-        if arg_iter.any(|x| x == "no-flush") {
-            print!("{}", VERSION);
-            return Ok(());
-        }
         fprint!("{}", VERSION);
     } else {
-        if arg_iter.any(|x| x == "no-flush") {
-            println!("{}", VERSION);
-            return Ok(());
-        }
         fprintln!("{}", VERSION);
     }
     Ok(())
