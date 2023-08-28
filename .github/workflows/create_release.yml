@@ -22,7 +22,7 @@ jobs:
           path: target/
           key: ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
     - name: Build
-      run: cargo build --verbose --release
+      run: cargo build +nightly --verbose --release
     - name: Version
       run: echo "::set-output name=version::$(.\target\release\dr-downloader-cli.exe version)"
       id: version
