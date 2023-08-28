@@ -26,7 +26,7 @@ jobs:
     - name: Build
       run: cargo build --verbose --release
     - name: Version
-      run: echo "::set-output name=version::$(.\target\release\dr-downloader-cli.exe version)"
+      run: echo "::set-output name=version::$(.\target\release\dr-downloader-cli.exe version no-newline)"
       id: version
     - name: Create release
       uses: softprops/action-gh-release@v1
