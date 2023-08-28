@@ -168,7 +168,13 @@ async fn token(args: Vec<String>, _passthrough: Passthrough) -> command_handler:
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let saver = setup_saver().await?;
+    let is_github_ci = std::env::var("GITHUB_ACTIONS").is_ok();
+
+    let mut saver = None;
+    if !is_github_ci {
+        saver = Some(setup_saver().await?);
+    }
+
     let (input_mode, inp, mut input_buffer) = setup_input().await?;
 
     let mut cmds = AsyncCommandHandler::new();
@@ -177,8 +183,10 @@ async fn main() -> Result<()> {
     cmds.register("token", |x, y| Box::pin(token(x, y)));
     cmds.register("version", |x, _| Box::pin(version(x)));
 
-    let shared_saver = Arc::new(Mutex::new(saver));
-
+    let mut shared_saver = None;
+    if !is_github_ci {
+        shared_saver = Some(Arc::new(Mutex::new(saver)));
+    }
     if input_mode {
         #[cfg(all(windows, not(debug_assertions)))]
         win32::set_virtual_console_mode();
@@ -190,7 +198,12 @@ async fn main() -> Result<()> {
             inp.read_line(&mut input_buffer)?;
         }
 
-        let result = cmds.handle(&input_buffer, Some(shared_saver.clone())).await;
+        let result = if !is_github_ci {
+             cmds.handle(&input_buffer, Some(shared_saver.clone().unwrap())).await
+        } else {
+             cmds.handle(&input_buffer, None).await
+        };
+
         if let Err(val) = result {
             log_error(val.to_string());
         }
