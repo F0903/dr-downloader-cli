@@ -25,6 +25,7 @@ use std::{
 };
 use tokio::sync::Mutex;
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 const FFMPEG: &[u8] = include_bytes!("../ffmpeg-win32.exe");
 
 fn log_error(err: impl AsRef<str>) {
@@ -98,16 +99,21 @@ async fn setup_input() -> Result<(bool, Stdin, String)> {
 }
 
 fn print_header() {
-    const VER: &str = env!("CARGO_PKG_VERSION");
     fprint!(
         "\x1B[1m\x1B[47m\x1B[31m DR \x1B[49m\x1B[39m Downloader CLI\x1B[0m v{}\n\n",
-        VER
+        VERSION
     );
 }
 
-fn clear() {
+async fn clear() -> command_handler::Result<()> {
     fprint!("\x1B[2J\x1B[1;1H");
     print_header();
+    Ok(())
+}
+
+async fn version() -> command_handler::Result<()> {
+    fprintln!("{}", VERSION);
+    Ok(())
 }
 
 async fn download(args: Vec<String>, passthrough: Passthrough) -> command_handler::Result<()> {
@@ -166,14 +172,10 @@ async fn main() -> Result<()> {
     let (input_mode, inp, mut input_buffer) = setup_input().await?;
 
     let mut cmds = AsyncCommandHandler::new();
-    cmds.register("clear", |_, _| {
-        Box::pin(async {
-            clear();
-            Ok(())
-        })
-    });
+    cmds.register("clear", |_, _| Box::pin(clear()));
     cmds.register("download", |x, y| Box::pin(download(x.to_owned(), y)));
     cmds.register("token", |x, y| Box::pin(token(x, y)));
+    cmds.register("version", |_, _| Box::pin(version()));
 
     let shared_saver = Arc::new(Mutex::new(saver));
 

@@ -35,3 +35,4 @@ Syntax: **command-name** _required-param_ _(optional-param)_
 **token** get -> Prints current token.  
 **token** set _token_ -> Sets current token.  
 **clear** -> Clears terminal.
+**version** -> Prints version.
