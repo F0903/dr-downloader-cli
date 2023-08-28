@@ -40,7 +40,6 @@ fn log_error(err: impl AsRef<str>) {
     } else {
         return;
     };
-    use std::io::Write;
     file.write_all(err_msg.as_bytes()).ok();
 }
 
@@ -111,7 +110,6 @@ fn print_header() {
 async fn clear() -> command_handler::Result<()> {
     std::io::stdout().flush()?;
     fprint!("\x1B[2J\x1B[1;1H");
-    print_header();
     Ok(())
 }
 
@@ -174,9 +172,6 @@ async fn token(args: Vec<String>, _passthrough: Passthrough) -> command_handler:
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    #[cfg(all(windows, not(debug_assertions)))]
-    win32::set_virtual_console_mode();
-
     let saver = setup_saver().await?;
     let (input_mode, inp, mut input_buffer) = setup_input().await?;
 
@@ -189,6 +184,8 @@ async fn main() -> Result<()> {
     let shared_saver = Arc::new(Mutex::new(saver));
 
     if input_mode {
+        #[cfg(all(windows, not(debug_assertions)))]
+        win32::set_virtual_console_mode();
         print_header();
     }
     do_while!((input_mode) {
