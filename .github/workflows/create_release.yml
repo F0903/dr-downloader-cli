@@ -15,6 +15,8 @@ jobs:
       contents: write
     
     steps:
+    - name: Set toolchain
+      run: rustup override set nightly
     - uses: actions/checkout@v3
     - name: Cache
       uses: actions/cache@v3.2.6
