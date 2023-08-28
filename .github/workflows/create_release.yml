@@ -18,11 +18,6 @@ jobs:
       contents: write
     
     steps:
-    - name: Test
-      id: test
-      run: echo "test=hello" >> $GITHUB_OUTPUT
-    - name: TestB
-      run: echo ${{ steps.Test.outputs.test }}
     - uses: actions/checkout@v3
     - name: Set toolchain
       run: rustup override set nightly
@@ -30,7 +25,7 @@ jobs:
       run: cargo build --verbose --release
     - name: Set version
       id: set_version
-      run: echo "$(./target/release/dr-downloader-cli.exe clear)" && echo "version=$(./target/release/dr-downloader-cli.exe version no-newline)" >> $GITHUB_OUTPUT
+      run: echo "version=$(./target/release/dr-downloader-cli.exe version no-newline)" >> $GITHUB_OUTPUT
     - name: Create release
       uses: softprops/action-gh-release@v1 
       with:
