@@ -1,6 +1,7 @@
 # dr-downloader-cli
 
 [![Rust](https://github.com/F0903/dr-downloader/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/F0903/dr-downloader/actions/workflows/rust.yml)
+[![Crates.io](https://shields.io/crates/v/dr-downloader.svg)](https://crates.io/crates/dr-downloader)
 
 A command-line downloader that downloads media from DR (Danish Broadcasting Corporation) in parallel, and converts them to convenient MP4 files.
 
