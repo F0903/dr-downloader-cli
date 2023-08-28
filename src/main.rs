@@ -43,10 +43,11 @@ fn log_error(err: impl AsRef<str>) {
 }
 
 fn create_ffmpeg() -> Result<String> {
-    if std::fs::try_exists("ffmpeg.exe")? {
-        return Ok("ffmpeg.exe".to_owned());
+    const FFMPEG_PATH: &str = "ffmpeg.exe";
+    if std::fs::try_exists(FFMPEG_PATH)? {
+        return Ok(FFMPEG_PATH.to_owned());
     };
-    let dir = std::env::temp_dir().join("ffmpeg.exe");
+    let dir = std::env::temp_dir().join(FFMPEG_PATH);
     let dir_str = dir.to_string_lossy().into_owned();
     std::fs::write(&dir_str, FFMPEG)?;
     Ok(dir_str)
@@ -80,7 +81,7 @@ async fn setup_converter() -> Result<Converter<'static>> {
 async fn setup_saver() -> Result<Saver<'static>> {
     let downloader = setup_downloader().await?;
     let converter = setup_converter().await?;
-    let saver = Saver::new(downloader).with_converter(converter, ".mp4");
+    let saver = Saver::new(downloader).with_converter(converter);
     Ok(saver)
 }
 
@@ -97,7 +98,11 @@ async fn setup_input() -> Result<(bool, Stdin, String)> {
 }
 
 fn print_header() {
-    fprint!("\x1B[1m\x1B[47m\x1B[31m DR \x1B[49m\x1B[39m Downloader CLI\x1B[0m\n\n");
+    const VER: &str = env!("CARGO_PKG_VERSION");
+    fprint!(
+        "\x1B[1m\x1B[47m\x1B[31m DR \x1B[49m\x1B[39m Downloader CLI\x1B[0m v{}\n\n",
+        VER
+    );
 }
 
 fn clear() {
@@ -112,10 +117,17 @@ async fn download(args: Vec<String>, passthrough: Passthrough) -> command_handle
         None => return Err("Invalid passthrough (internal error)".into()),
     };
 
-    let url = args.into_iter().collect::<String>();
+    let mut arg_iter = args.into_iter();
+    let url = arg_iter.next().ok_or("URL as first argument required.")?;
+    let format = arg_iter
+        .next()
+        .map(|x| dr_downloader::format::Format::new(x));
 
     let saver = saver.lock().await;
-    saver.save(url, "./").await.map_err(|e| e.to_string())?;
+    saver
+        .save(url, "./", format)
+        .await
+        .map_err(|e| e.to_string())?;
 
     fprintln!("\x1B[92mDone!\x1B[0m");
     Ok(())
@@ -160,7 +172,6 @@ async fn main() -> Result<()> {
             Ok(())
         })
     });
-    cmds.register("exit", |_, _| panic!("Exit requested."));
     cmds.register("download", |x, y| Box::pin(download(x.to_owned(), y)));
     cmds.register("token", |x, y| Box::pin(token(x, y)));
 
@@ -177,6 +188,8 @@ async fn main() -> Result<()> {
         if let Err(val) = result {
             log_error(val.to_string());
         }
+
+        println!()
     });
     Ok(())
 }

@@ -13,9 +13,25 @@ Note:
 This program will most likely only work in Denmark, as DR has restrictions on who can access their content.
 Use of this program assumes you have the right to download the relevant media.
 
+## Setup
+
+**Before downloading, you will need an authentication token as explained below.**
+
+- First, go to the DR-TV video player.
+- Press F12. This should open the developer window on the right of the page.
+- Go to the Network tab and press CTRL+R. This will reload the page. You should now see a lot of requests in the window.
+- Find the request whose name starts with "account?ff="
+- Then scroll down on the right "Headers" section of the request, and find the header called "X-Authorization".
+- Copy the value of this header EXCEPT the "Bearer" part. Make sure the token has no spaces or newline characters.
+- Start the program, type "token set ", paste your token, and press enter.
+
+You should now be able to download any episode or show.
+
 ## Commands
 
-**download** *url* -> Downloads media.  
+Syntax: **command-name** _required-param_ _(optional-param)_
+
+**download** _url_ _(format)_ -> Downloads media.  
 **token** get -> Prints current token.  
-**token** set -> Sets current token.  
-**clear** -> Clears terminal.  
+**token** set _token_ -> Sets current token.  
+**clear** -> Clears terminal.
