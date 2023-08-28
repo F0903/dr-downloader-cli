@@ -181,7 +181,7 @@ dependencies = [
 
 [[package]]
 name = "dr-downloader-cli"
-version = "2.1.0"
+version = "2.1.1"
 dependencies = [
  "dr-downloader",
  "tokio",

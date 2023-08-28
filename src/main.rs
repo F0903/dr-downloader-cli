@@ -1,4 +1,5 @@
 #![feature(fs_try_exists)]
+#![feature(iter_intersperse)]
 
 #[cfg(all(windows, not(debug_assertions)))]
 mod win32;
@@ -87,13 +88,15 @@ async fn setup_saver() -> Result<Saver<'static>> {
 }
 
 async fn setup_input() -> Result<(bool, Stdin, String)> {
-    let mut args = std::env::args();
+    let args = std::env::args();
     let input_mode = args.len() <= 1;
     let inp = stdin();
     let input_buffer = if input_mode {
         String::new()
     } else {
-        args.nth(1).unwrap()
+        args.skip(1)
+            .intersperse(String::from_utf8_lossy(&[b' ']).into_owned())
+            .collect()
     };
     Ok((input_mode, inp, input_buffer))
 }
@@ -179,10 +182,12 @@ async fn main() -> Result<()> {
 
     let shared_saver = Arc::new(Mutex::new(saver));
 
-    print_header();
+    if input_mode {
+        print_header();
+    }
     do_while!((input_mode) {
-        input_buffer.clear();
         if input_mode {
+            input_buffer.clear();
             inp.read_line(&mut input_buffer)?;
         }
 
@@ -191,7 +196,7 @@ async fn main() -> Result<()> {
             log_error(val.to_string());
         }
 
-        println!()
+        println!();
     });
     Ok(())
 }
