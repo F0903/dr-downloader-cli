@@ -16,6 +16,9 @@ Use of this program assumes you have the right to download the relevant media.
 
 ## Setup
 
+**To convert files, you must have FFmpeg installed!**
+Either add the FFmpeg root to PATH, or put the FFmpeg.exe in the downloaders root folder.
+
 **Before downloading, you will need an authentication token as explained below.**
 
 - First, go to the DR-TV video player.
