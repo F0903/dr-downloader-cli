@@ -52,7 +52,7 @@ impl AsyncCommandHandler {
         let cmd = self
             .commands
             .get(identifier)
-            .ok_or("Command not found!".to_owned())?;
+            .ok_or(format!("Command '{}' not recognized.", identifier))?;
         cmd(args, passthrough).await
     }
 
