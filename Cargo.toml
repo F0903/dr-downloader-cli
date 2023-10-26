@@ -1,6 +1,6 @@
 [package]
 name = "dr-downloader-cli"
-version = "2.1.3"
+version = "2.1.4"
 authors = ["Frederik P. B. H. <frepbh@gmail.com>"]
 edition = "2021"
 license-file = "LICENSE"
@@ -13,7 +13,7 @@ opt-level = "z" # Optimize for size.
 lto = true
 
 [dependencies]
-dr-downloader = { version = "0.6.2" }
+dr-downloader = { version = "0.6.3" }
 #dr-downloader = { path = "../dr-downloader" }                    # FOR DEBUGGING
 tokio = { version = "^1", features = ["rt", "rt-multi-thread"] }
 

@@ -126,10 +126,7 @@ async fn download<'a>(args: Vec<String>, saver: Passthrough) -> command_handler:
         .next()
         .map(|x| dr_downloader::format::Format::new(x));
 
-    saver
-        .save(url, "./", format)
-        .await
-        .map_err(|e| e.to_string())?;
+    saver.save(url, "./", format).await?;
 
     fprintln!("\x1B[92mDone!\x1B[0m");
     Ok(())

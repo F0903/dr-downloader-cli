@@ -154,9 +154,9 @@ dependencies = [
 
 [[package]]
 name = "dr-downloader"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd993973f5d9cb62e86099aaa690e48b07818ac50cd062fa73adddef0ba448f4"
+checksum = "7f9d1bdfe7310de92a7099539e5cade71057bc48133bf734147b1d0e8cdf17d5"
 dependencies = [
  "async-recursion",
  "futures",
@@ -171,7 +171,7 @@ dependencies = [
 
 [[package]]
 name = "dr-downloader-cli"
-version = "2.1.3"
+version = "2.1.4"
 dependencies = [
  "dr-downloader",
  "tokio",
