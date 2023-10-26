@@ -24,7 +24,6 @@ use std::{
     io::{stdin, Stdin, Write},
     sync::Arc,
 };
-use tokio::sync::Mutex;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -44,10 +43,11 @@ fn log_error(err: impl AsRef<str>) {
 
 fn create_ffmpeg() -> Result<String> {
     const FFMPEG_PATH: &str = "ffmpeg.exe";
-    if std::fs::try_exists(FFMPEG_PATH)? {
-        return Ok(FFMPEG_PATH.to_owned());
+    return Ok(FFMPEG_PATH.to_owned());
+    /* if std::fs::try_exists(FFMPEG_PATH)? {
+
     };
-    return Err("FFmpeg not found! Please install FFmpeg and add to PATH or put the executable in the downloader root.".into());
+    return Err("FFmpeg not found! Please install FFmpeg and add to PATH or put the executable in the downloader root.".into()); */
 }
 
 async fn setup_downloader() -> Result<Downloader<'static>> {
@@ -119,20 +119,13 @@ async fn version(args: Vec<String>) -> command_handler::Result<()> {
     Ok(())
 }
 
-async fn download(args: Vec<String>, passthrough: Passthrough) -> command_handler::Result<()> {
-    let saver = match passthrough {
-        Some(x) => Arc::downcast::<Mutex<Saver>>(x)
-            .map_err(|_| "Invalid passthrough (internal error)".to_owned())?,
-        None => return Err("Invalid passthrough (internal error)".into()),
-    };
-
+async fn download<'a>(args: Vec<String>, saver: Passthrough) -> command_handler::Result<()> {
     let mut arg_iter = args.into_iter();
     let url = arg_iter.next().ok_or("URL as first argument required.")?;
     let format = arg_iter
         .next()
         .map(|x| dr_downloader::format::Format::new(x));
 
-    let saver = saver.lock().await;
     saver
         .save(url, "./", format)
         .await
@@ -142,7 +135,7 @@ async fn download(args: Vec<String>, passthrough: Passthrough) -> command_handle
     Ok(())
 }
 
-async fn token(args: Vec<String>, _passthrough: Passthrough) -> command_handler::Result<()> {
+async fn token<'a>(args: Vec<String>, _saver: Passthrough) -> command_handler::Result<()> {
     let mut args_iter = args.iter();
     let subcommand = match args_iter.next() {
         Some(x) => x,
@@ -166,27 +159,29 @@ async fn token(args: Vec<String>, _passthrough: Passthrough) -> command_handler:
     Ok(())
 }
 
+macro_rules! async_handler_call {
+    ($func_call:expr) => {{
+        let val = $func_call;
+        std::boxed::Box::pin(val)
+    }};
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
-    let is_github_ci = std::env::var("GITHUB_ACTIONS").is_ok();
-
-    let mut saver = None;
-    if !is_github_ci {
-        saver = Some(setup_saver().await?);
-    }
+    //let is_github_ci = std::env::var("GITHUB_ACTIONS").is_ok();
 
     let (input_mode, inp, mut input_buffer) = setup_input().await?;
 
     let mut cmds = AsyncCommandHandler::new();
-    cmds.register("clear", |_, _| Box::pin(clear()));
-    cmds.register("download", |x, y| Box::pin(download(x.to_owned(), y)));
-    cmds.register("token", |x, y| Box::pin(token(x, y)));
-    cmds.register("version", |x, _| Box::pin(version(x)));
+    cmds.register("clear", |_, _| async_handler_call!(clear()));
+    cmds.register("download", |x, y| {
+        async_handler_call!(download(x.to_owned(), y))
+    });
+    cmds.register("token", |x, y| async_handler_call!(token(x, y)));
+    cmds.register("version", |x, _| async_handler_call!(version(x)));
 
-    let mut shared_saver = None;
-    if !is_github_ci {
-        shared_saver = Some(Arc::new(Mutex::new(saver)));
-    }
+    let saver = Arc::new(setup_saver().await?);
+
     if input_mode {
         #[cfg(all(windows, not(debug_assertions)))]
         win32::set_virtual_console_mode();
@@ -198,11 +193,7 @@ async fn main() -> Result<()> {
             inp.read_line(&mut input_buffer)?;
         }
 
-        let result = if !is_github_ci {
-             cmds.handle(&input_buffer, Some(shared_saver.clone().unwrap())).await
-        } else {
-             cmds.handle(&input_buffer, None).await
-        };
+        let result = cmds.handle(&input_buffer, saver.clone()).await;
 
         if let Err(val) = result {
             log_error(val.to_string());

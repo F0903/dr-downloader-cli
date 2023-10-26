@@ -1,4 +1,3 @@
-use std::any::Any;
 use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
@@ -6,9 +5,12 @@ use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use dr_downloader::saver::Saver;
+
 pub type Result<T> = std::result::Result<T, Box<dyn Error + Send + Sync>>;
 
-pub type Passthrough = Option<Arc<dyn Any + Send + Sync>>;
+pub type Passthrough = Arc<Saver<'static>>;
+
 type CmdHandlerReturn = Pin<Box<dyn Future<Output = Result<()>>>>;
 type CmdHandler = fn(Vec<String>, Passthrough) -> CmdHandlerReturn;
 
