@@ -18,7 +18,7 @@ jobs:
       contents: write
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set toolchain
       run: rustup override set nightly
     - name: Build
@@ -30,4 +30,5 @@ jobs:
       uses: softprops/action-gh-release@v1 
       with:
         tag_name: ${{ steps.set_version.outputs.version }}
+        body: ${{ github.event.head_commit.message }}
         files: target/release/dr-downloader-cli.exe
