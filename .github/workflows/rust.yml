@@ -16,18 +16,14 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
-    - uses: Swatinem/rust-cache@v1
-    
+    - uses: actions/checkout@v4
+    - uses: Swatinem/rust-cache@v2
+    - name: Set toolchain
+      run: rustup override set nightly
     - name: Build
       run: cargo build --verbose --release
-      
     - name: Upload binary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ github.event.repository.name }}-win64
         path: ./target/release/${{ github.event.repository.name }}.exe
